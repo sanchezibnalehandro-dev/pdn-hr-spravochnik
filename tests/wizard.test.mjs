@@ -66,7 +66,7 @@ for (const name of pages) {
     app.wNext(2, 'fio_yes');
     app.wNext(3, 'sens_yes');
     app.wNext(4, 'chatgpt');
-    assert.match(node('w-verdict').innerHTML, /Категорически нельзя/);
+    assert.match(node('w-verdict').innerHTML, /Остановите передачу до согласования/);
 
     app.wNext(2, 'fio_no');
     assert.equal(node('w-q3').classList.contains('hidden'), false);
