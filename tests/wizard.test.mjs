@@ -56,7 +56,7 @@ for (const name of pages) {
     app.wNext(3, 'sens_yes');
     assert.equal(node('w-q4').classList.contains('hidden'), false);
     app.wNext(4, 'chatgpt');
-    assert.match(node('w-verdict').innerHTML, /Категорически нельзя/);
+    assert.match(node('w-verdict').innerHTML, /Остановите передачу до согласования/);
     assert.equal(node('w-verdict').style.display, 'block');
   });
 
@@ -72,24 +72,28 @@ for (const name of pages) {
     assert.equal(node('w-q3').classList.contains('hidden'), false);
     app.wNext(3, 'sens_no');
     app.wNext(4, 'qwen');
-    assert.match(node('w-verdict').innerHTML, /Можно загружать/);
+    assert.match(node('w-verdict').innerHTML, /Нужна проверка перед загрузкой/);
     assert.doesNotMatch(node('w-verdict').innerHTML, /спецкатегории/);
   });
 
-  test(`${name}: document types with early verdicts and full reset keep working`, async () => {
+  test(`${name}: conservative document handling and reset keep working`, async () => {
     const { app, node } = await loadApp(name);
     app.wNext(1, 'contract');
-    assert.match(node('w-verdict').innerHTML, /Загружать нельзя/);
+    assert.match(node('w-verdict').innerHTML, /Остановите загрузку кадрового оригинала/);
     app.resetWizard();
     assert.equal(node('w-q1').classList.contains('hidden'), false);
     app.wNext(1, 'template');
-    assert.match(node('w-verdict').innerHTML, /Можно загружать/);
+    assert.equal(node('w-q2').classList.contains('hidden'), false);
+    app.wNext(2, 'fio_no');
+    app.wNext(3, 'sens_no');
+    app.wNext(4, 'qwen');
+    assert.match(node('w-verdict').innerHTML, /Нужна проверка перед загрузкой/);
   });
 
-  test(`${name}: the unverified legal calculator is visibly labelled`, async () => {
+  test(`${name}: legal calculator is sourced, dated and contextualized`, async () => {
     const { html } = await loadApp(name);
-    assert.match(html, /калькулятор.*не прошли проверку/s);
-    assert.match(html, /Не используйте результаты калькулятора/);
+    assert.match(html, /Нормы сверены по состоянию на 14\.10\.2026/);
+    assert.match(html, /Калькулятор показывает только диапазоны санкций/);
     assert.doesNotMatch(html, /420-ФЗ · актуальная редакция/);
     assert.match(html, /rel="noopener noreferrer"/);
   });
